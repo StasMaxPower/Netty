@@ -11,7 +11,7 @@ import io.netty.util.CharsetUtil;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-public class PostClient {
+public class GetClient {
 
     private static final int PORT = 8080;
     private static final String HOST = "localhost";
@@ -26,24 +26,16 @@ public class PostClient {
                     .handler(new HttpClientInitializer());
 
             var channel = bootstrap.connect(HOST, PORT).sync().channel();
-            sendRequest(channel);
+            sendGetRequest(channel);
             channel.closeFuture().sync();
         } finally {
             group.shutdownGracefully();
         }
     }
 
-    private static void sendRequest(Channel channel) throws URISyntaxException {
-        var uri = new URI("http://" + HOST + ":" + PORT);
-        var requestParams = "Java";
-        var requestParamsBytes = Unpooled.copiedBuffer(requestParams, CharsetUtil.UTF_8);
-
-        var request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, uri.getRawPath());
-        request.headers().set(HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.APPLICATION_X_WWW_FORM_URLENCODED);
-
-        request.headers().set(HttpHeaderNames.CONTENT_LENGTH, requestParamsBytes.readableBytes());
-        request.content().writeBytes(requestParamsBytes);
-
+    private static void sendGetRequest(Channel channel) throws URISyntaxException {
+        var uri = new URI("http://" + HOST + ":" + PORT + "/?name=Ivan");
+        var request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, uri.toString());
         channel.writeAndFlush(request);
     }
 }

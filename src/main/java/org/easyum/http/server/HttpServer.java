@@ -15,12 +15,12 @@ public class HttpServer {
     private static final int PORT = 8080;
 
     public static void main(String[] args) throws Exception {
-        var eventLoopGroup = new NioEventLoopGroup(1);
+        var eventLoopGroup = new NioEventLoopGroup(2);
         var workerGroup = new NioEventLoopGroup();
         try {
             var serverBootstrap = new ServerBootstrap();
             serverBootstrap.option(ChannelOption.SO_BACKLOG, 1024);
-            serverBootstrap.group(eventLoopGroup, workerGroup)
+            serverBootstrap.group(eventLoopGroup)
                     .channel(NioServerSocketChannel.class)
                     .handler(new LoggingHandler(LogLevel.INFO))
                     .childHandler(new HttpHelloWorldServerInitializer());
